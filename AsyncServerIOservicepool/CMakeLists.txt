@@ -13,6 +13,7 @@ set(SERVER_SOURCES
   ${PROJECT_SOURCE_DIR}/src/Server.cpp
   ${PROJECT_SOURCE_DIR}/src/Session.cpp
   ${PROJECT_SOURCE_DIR}/src/MsgNode.cpp
+  ${PROJECT_SOURCE_DIR}/src/logicsystem.cpp
 )
 
 # 可执行程序

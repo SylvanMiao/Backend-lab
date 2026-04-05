@@ -1,5 +1,6 @@
 #include "Session.h"
 #include "Server.h"
+#include "logicsystem.h"
 #include <iostream>
 #include <sstream>
 #include <cstdint>
@@ -88,6 +89,13 @@ void Session::HandleWrite(const boost::system::error_code& error, std::shared_pt
 			}
 		}
 		else {
+			if (error == boost::asio::error::eof ||
+				error == boost::asio::error::connection_reset ||
+				error == boost::asio::error::operation_aborted) {
+				Close();
+				_server->ClearSession(_uuid);
+				return;
+			}
 			std::cout << "handle write failed, error is " << error.what() << endl;
 			Close();
 			_server->ClearSession(_uuid);
@@ -102,6 +110,13 @@ void Session::HandleWrite(const boost::system::error_code& error, std::shared_pt
 void Session::HandleReadHead(const boost::system::error_code& error, size_t bytes_transferred, std::shared_ptr<Session> shared_self) {
 	try {
 		if (error) {
+			if (error == boost::asio::error::eof ||
+				error == boost::asio::error::connection_reset ||
+				error == boost::asio::error::operation_aborted) {
+				Close();
+				_server->ClearSession(_uuid);
+				return;
+			}
 			std::cout << "handle read head failed, error is " << error.what() << endl;
 			Close();
 			_server->ClearSession(_uuid);
@@ -153,6 +168,13 @@ void Session::HandleReadHead(const boost::system::error_code& error, size_t byte
 void Session::HandleReadBody(const boost::system::error_code& error, size_t bytes_transferred, std::shared_ptr<Session> shared_self) {
 	try {
 		if (error) {
+			if (error == boost::asio::error::eof ||
+				error == boost::asio::error::connection_reset ||
+				error == boost::asio::error::operation_aborted) {
+				Close();
+				_server->ClearSession(_uuid);
+				return;
+			}
 			std::cout << "handle read body failed, error is " << error.what() << endl;
 			Close();
 			_server->ClearSession(_uuid);
@@ -168,15 +190,8 @@ void Session::HandleReadBody(const boost::system::error_code& error, size_t byte
 
 		_recv_msg_node->_cur_len = _recv_msg_node->_total_len;
 		_recv_msg_node->_data[_recv_msg_node->_total_len] = '\0';
-
-		Json::Reader reader;
-		Json::Value root;
-		reader.parse(std::string(_recv_msg_node->_data, _recv_msg_node->_total_len), root);
-		std::cout << "recevie msg id  is " << root["id"].asInt() << " msg data is "
-			<< root["data"].asString() << endl;
-		root["data"] = "server has received msg, msg data is " + root["data"].asString();
-		std::string return_str = root.toStyledString();
-		Send(return_str, root["id"].asInt());
+    // 把包封装成 LogicNode 投递到 逻辑层队列里面
+		LogicSystem::GetInstance()->PostMsgToQue(std::make_shared<LogicNode>(shared_self, _recv_msg_node));
 
 		_recv_head_node->Clear();
 		boost::asio::async_read(_socket, boost::asio::buffer(_recv_head_node->_data, HEAD_TOTAL_LEN),

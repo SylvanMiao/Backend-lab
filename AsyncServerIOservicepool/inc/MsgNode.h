@@ -30,6 +30,9 @@ public:
 class RecvNode :public MsgNode {
 public:
     RecvNode(short max_len, short msg_id);
+    short GetMsgId() const {
+        return _msg_id;
+    }
 private:
     short _msg_id;
 };
