@@ -1,6 +1,7 @@
 #pragma once
 #include <boost/asio.hpp>
 #include "Session.h"
+#include "IOservicePool.h"
 #include <memory.h>
 #include <map>
 using namespace std;

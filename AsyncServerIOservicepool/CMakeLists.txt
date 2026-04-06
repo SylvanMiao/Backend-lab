@@ -4,16 +4,18 @@ project(GateServer VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 第三方目录位于上一级 Backend-lab
+# 第三方目录位于上一级
 get_filename_component(BACKEND_LAB_DIR "${PROJECT_SOURCE_DIR}/.." ABSOLUTE)
 set(THIRDPARTY_DIR "${BACKEND_LAB_DIR}/thirdparty")
 
-# Server 程序源文件（含 main）
+# Server 程序源文件
 set(SERVER_SOURCES
+  ${PROJECT_SOURCE_DIR}/src/main.cpp  
   ${PROJECT_SOURCE_DIR}/src/Server.cpp
   ${PROJECT_SOURCE_DIR}/src/Session.cpp
   ${PROJECT_SOURCE_DIR}/src/MsgNode.cpp
   ${PROJECT_SOURCE_DIR}/src/logicsystem.cpp
+  ${PROJECT_SOURCE_DIR}/src/IOservicePool.cpp
 )
 
 # 可执行程序

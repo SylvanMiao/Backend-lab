@@ -12,7 +12,7 @@ public:
         _data[_total_len] = '\0';
     }
     ~MsgNode() {
-        std::cout << "destruct MsgNode" << std::endl;
+        std::cout << "~MsgNode destruct" << std::endl;
         delete[] _data;
     }
     void Clear() {
