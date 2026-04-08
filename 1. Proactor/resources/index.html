@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>功德+1</title>
+    <style>
+        /* 清爽简洁风格 */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html,body { height: 100%; }
+        body {
+            font-family: "Segoe UI", "Microsoft YaHei", system-ui, -apple-system, "Helvetica Neue", Arial;
+            background: linear-gradient(180deg, #f5f9ff 0%, #eaf2ff 60%);
+            color: #18344b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 14px;
+            padding: 28px;
+            box-shadow: 0 6px 22px rgba(24,52,75,0.08);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #0f2940;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            color: #4b6b86;
+            font-size: 0.95rem;
+            margin-bottom: 18px;
+        }
+
+        .merit-row { display:flex; align-items:center; justify-content:center; gap:12px; margin: 12px 0 18px; }
+        .merit-counter { font-size:1rem; color:#4b6b86; }
+        .merit-display {
+            font-size:2.4rem;
+            font-weight:700;
+            color:#0f2940;
+            padding:6px 12px;
+            border-radius:8px;
+            background: linear-gradient(180deg, rgba(15,41,64,0.04), rgba(15,41,64,0.02));
+            min-width:110px;
+        }
+
+        .wooden-fish-container {
+            margin: 16px auto;
+            width: 220px;
+            height: 220px;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.12s ease;
+            position: relative;
+            user-select: none;
+            top: -6px; /* 上移一点 */
+        }
+
+        .wooden-fish {
+            width: 88%;
+            height: 88%;
+            border-radius: 50%;
+            background: linear-gradient(180deg,#d6a66b,#be8a4a);
+            box-shadow: inset 0 -6px 16px rgba(0,0,0,0.12), 0 8px 18px rgba(16,40,60,0.06);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:1.4rem;
+            color:#fff;
+        }
+
+        .wooden-fish-text {
+            position: absolute;
+            bottom: -12px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #58738a;
+        }
+
+        .controls {
+            display:flex;
+            gap:12px;
+            justify-content:center;
+            margin-top: 14px;
+            flex-wrap:wrap;
+        }
+
+        button {
+            border: none;
+            background: #0f2940;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: transform .12s ease, box-shadow .12s ease;
+            box-shadow: 0 3px 10px rgba(15,41,64,0.08);
+        }
+
+        button.alt {
+            background: transparent;
+            color: #0f2940;
+            border: 1px solid rgba(15,41,64,0.08);
+            box-shadow: none;
+        }
+
+        button:active { transform: translateY(1px); }
+
+        .instructions {
+            color:#59758a;
+            font-size:0.92rem;
+            margin-top:18px;
+            line-height:1.5;
+        }
+
+        /* 点击圈和浮动文字（更轻） */
+        .click-effect {
+            position: absolute;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(15,41,64,0.12);
+            pointer-events: none;
+            transform: translate(-50%,-50%) scale(0.6);
+            animation: rippleClean 450ms ease-out forwards;
+        }
+
+        @keyframes rippleClean {
+            to { transform: translate(-50%,-50%) scale(2.2); opacity:0; }
+        }
+
+        .floating-text {
+            position: fixed;
+            font-size: 0.88rem;
+            color: #0f2940;
+            background: rgba(255,255,255,0.85);
+            padding:6px 8px;
+            border-radius:8px;
+            box-shadow: 0 6px 18px rgba(16,40,60,0.06);
+            pointer-events: none;
+            transform: translate(-50%,-50%);
+            animation: floatClean 1.2s ease-out forwards;
+        }
+
+        @keyframes floatClean {
+            0% { opacity:1; transform: translate(-50%,-50%) translateY(0); }
+            100% { opacity:0; transform: translate(-50%,-50%) translateY(-64px); }
+        }
+
+        /* 后台轻微气泡效果（清爽） */
+        .bg-bubble {
+            position: fixed;
+            bottom: -10vh; /* 从视口底部开始，避免影响文档高度 */
+            width: 14px;
+            height: 14px;
+            background: rgba(15,41,64,0.04);
+            border-radius: 50%;
+            left: 0;
+            transform: translateY(100vh);
+            animation: bubbleUp linear forwards;
+            pointer-events: none;
+        }
+
+        @keyframes bubbleUp {
+            to { transform: translateY(-110vh) scale(1.6); opacity: 0; }
+        }
+
+        @media (max-width: 520px) {
+            .wooden-fish-container { width: 180px; height:180px; }
+            .merit-display { min-width:90px; font-size:1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>电子木鱼</h1>
+        <p class="subtitle">轻点即得功德</p>
+
+        <div class="merit-row">
+            <div class="merit-counter">功德值：</div>
+            <div class="merit-display" id="merit">0</div>
+        </div>
+
+        <div class="wooden-fish-container" id="wooden-fish" title="点击或按空格">
+            <div class="wooden-fish">敲一敲</div>
+            <div class="wooden-fish-text">点击或按空格键</div>
+        </div>
+
+        <div class="controls">
+            <button id="reset" class="alt">重置功德</button>
+            <button id="auto-click">自动敲击：关</button>
+        </div>
+
+        <div class="instructions">
+            <p>每点击一次木鱼，功德值 +1。开启自动敲击后会按固定频率自动增加。</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const woodenFish = document.getElementById('wooden-fish');
+            const meritDisplay = document.getElementById('merit');
+            const resetButton = document.getElementById('reset');
+            const autoClickButton = document.getElementById('auto-click');
+
+            let merit = parseInt(localStorage.getItem('merit')) || 0;
+            let autoClickInterval = null;
+            let soundEnabled = true;
+            let audioContext = null; // 复用一个 AudioContext
+
+            // 初始化显示
+            meritDisplay.textContent = merit;
+
+            // 轻量背景气泡（低频率，轻量）
+            function createBubble() {
+                const b = document.createElement('div');
+                b.className = 'bg-bubble';
+                b.style.left = (10 + Math.random() * 80) + '%';
+                b.style.width = b.style.height = (8 + Math.random() * 18) + 'px';
+                b.style.animationDuration = (6 + Math.random() * 8) + 's';
+                b.style.opacity = (0.08 + Math.random() * 0.08);
+                document.body.appendChild(b);
+                setTimeout(() => b.remove(), 12000);
+            }
+            setInterval(createBubble, 1800);
+
+            // 播放木鱼声，复用 AudioContext
+            function playWoodenFishSound() {
+                try {
+                    if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const now = audioContext.currentTime;
+                    const o = audioContext.createOscillator();
+                    const g = audioContext.createGain();
+                    o.type = 'sine';
+                    o.frequency.value = 200;
+                    g.gain.setValueAtTime(0.18, now);
+                    g.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                    o.connect(g);
+                    g.connect(audioContext.destination);
+                    o.start(now);
+                    o.stop(now + 0.45);
+                } catch (e) {
+                    // 某些浏览器在没有用户交互时可能拒绝创建上下文，忽略错误
+                    console.warn('Audio not available', e);
+                }
+            }
+
+            // 敲击木鱼，接受可选事件参数
+            function knockWoodenFish(evt) {
+                // 增加功德
+                merit++;
+                meritDisplay.textContent = merit;
+                localStorage.setItem('merit', merit);
+
+                // 轻微按压动画
+                woodenFish.style.transform = 'scale(0.98)';
+                setTimeout(() => woodenFish.style.transform = '', 110);
+
+                // 点击效果位置：优先使用事件的偏移，否则居中
+                const rect = woodenFish.getBoundingClientRect();
+                let x, y;
+                if (evt && evt instanceof MouseEvent) {
+                    // 事件相对于容器的位置
+                    const targetRect = evt.target.getBoundingClientRect();
+                    x = evt.clientX - rect.left;
+                    y = evt.clientY - rect.top;
+                } else {
+                    x = rect.width / 2;
+                    y = rect.height / 2;
+                }
+
+                // 创建点击圈
+                const effect = document.createElement('div');
+                effect.className = 'click-effect';
+                effect.style.left = x + 'px';
+                effect.style.top = y + 'px';
+                woodenFish.appendChild(effect);
+                setTimeout(() => effect.remove(), 520);
+
+                // 浮动文字，使用固定定位避免容器 overflow 问题
+                const floatingText = document.createElement('div');
+                floatingText.className = 'floating-text';
+                floatingText.textContent = '+1';
+                // 使用全局坐标（鼠标或容器中心）
+                if (evt && evt instanceof MouseEvent) {
+                    floatingText.style.left = evt.clientX + 'px';
+                    floatingText.style.top = (evt.clientY - 12) + 'px';
+                } else {
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    floatingText.style.left = centerX + 'px';
+                    floatingText.style.top = (centerY - 12) + 'px';
+                }
+                document.body.appendChild(floatingText);
+                setTimeout(() => floatingText.remove(), 1200);
+
+                // 播放声音（如果可用）
+                if (soundEnabled) playWoodenFishSound();
+            }
+
+            // 绑定事件
+            woodenFish.addEventListener('click', knockWoodenFish);
+
+            // 重置
+            resetButton.addEventListener('click', function() {
+                merit = 0;
+                meritDisplay.textContent = merit;
+                localStorage.setItem('merit', merit);
+            });
+
+            // 自动敲击：开/关切换
+            autoClickButton.addEventListener('click', function() {
+                if (autoClickInterval) {
+                    clearInterval(autoClickInterval);
+                    autoClickInterval = null;
+                    autoClickButton.textContent = '自动敲击：关';
+                } else {
+                    // 800ms 频率，使用事件为 null（居中效果）
+                    autoClickInterval = setInterval(() => knockWoodenFish(null), 800);
+                    autoClickButton.textContent = '自动敲击：开';
+                }
+            });
+
+            // 空格键支持
+            document.addEventListener('keydown', function(e) {
+                if (e.code === 'Space') {
+                    knockWoodenFish(e);
+                    e.preventDefault();
+                }
+            });
+
+            // 在首次用户交互时尝试恢复/解锁声音（可选）
+            function unlockAudio() {
+                if (!audioContext) {
+                    try {
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        // 一点静音脉冲以解锁（随后关闭）
+                        const o = audioContext.createOscillator();
+                        const g = audioContext.createGain();
+                        g.gain.value = 0;
+                        o.connect(g);
+                        g.connect(audioContext.destination);
+                        o.start();
+                        o.stop(audioContext.currentTime + 0.01);
+                    } catch (_) {}
+                }
+                document.removeEventListener('pointerdown', unlockAudio);
+                document.removeEventListener('keydown', unlockAudio);
+            }
+            document.addEventListener('pointerdown', unlockAudio);
+            document.addEventListener('keydown', unlockAudio);
+        });
+    </script>
+</body>
+</html>
